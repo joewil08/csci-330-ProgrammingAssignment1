@@ -15,15 +15,28 @@ def get_file_info(data: bytes) -> (str, int):
 def upload_file(server_socket: socket, file_name: str, file_size: int):
     # create a SHA256 object to verify file hash
     # TODO: section 1 step 5 in README.md file
+    server_hash = hashlib.sha256()
 
     # create a new file to store the received data
     with open(file_name+'.temp', 'wb') as file:
         # TODO: section 1 step 7a - 7e in README.md file
-        pass  # replace this line with your code for section 1 step 7a - 7e
+        bytes_received = 0
+        while bytes_received < file_size:
+            data, client_address = server_socket.recvfrom(BUFFER_SIZE)
+            file.write(data)
+            server_hash.update(data)
+            server_socket.sendto(b'received', client_address)
+            bytes_received += BUFFER_SIZE
 
     # get hash from client to verify
     # TODO: section 1 step 8 in README.md file
+    client_hash, client_address = server_socket.recvfrom(BUFFER_SIZE)
     # TODO: section 1 step 9 in README.md file
+    if client_hash == server_hash:
+        server_socket.sendto(b'success', client_address)
+    else:
+        os.remove(file_name + '.temp')
+        server_socket.sendto(b'failed', client_address)
 
 
 def start_server():
