@@ -3,7 +3,7 @@ import os
 import hashlib  # needed to verify file hash
 
 
-IP = '127.0.0.1'  # change to the IP address of the server
+IP = '192.168.1.168'  # change to the IP address of the server
 PORT = 12000  # change to a desired port number
 BUFFER_SIZE = 1024  # change to a desired buffer size
 
@@ -32,7 +32,7 @@ def upload_file(server_socket: socket, file_name: str, file_size: int):
     # TODO: section 1 step 8 in README.md file
     client_hash, client_address = server_socket.recvfrom(BUFFER_SIZE)
     # TODO: section 1 step 9 in README.md file
-    if client_hash == server_hash:
+    if client_hash == server_hash.digest():
         server_socket.sendto(b'success', client_address)
     else:
         os.remove(file_name + '.temp')
